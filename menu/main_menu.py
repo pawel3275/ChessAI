@@ -1,5 +1,5 @@
-from window import Window, WINDOW_SIZE
-from button import Button
+from utilities.window import Window, WINDOW_SIZE
+from utilities.button import Button
 import pygame
 
 

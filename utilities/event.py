@@ -1,5 +1,6 @@
 import pygame
 
+
 class EventHandler:
     def __init__(self):
         pass
@@ -10,3 +11,8 @@ class EventHandler:
             return 2
         if event.type == pygame.RESIZABLE:
             return 3
+
+    @staticmethod
+    def on_button_click():
+        pass
+

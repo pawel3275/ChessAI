@@ -1,6 +1,6 @@
-from window import Window, WINDOW_SIZE
-from event import EventHandler
-from main_menu import MainMenu
+from utilities.window import Window
+from utilities.event import EventHandler
+from menu.main_menu import MainMenu
 import pygame
 
 
