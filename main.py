@@ -9,9 +9,7 @@ if __name__ == '__main__':
     main_window = Window()
     menu_view = MainMenu()
 
-
-    eventCode = 1
-    while eventCode != 2:
+    while EventHandler.window_code != 2:
         # Event processing
         for event in pygame.event.get():
             eventCode = EventHandler.process_event(event)

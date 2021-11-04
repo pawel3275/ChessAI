@@ -1,5 +1,6 @@
 from utilities.window import Window, WINDOW_SIZE
 from utilities.button import Button
+from utilities.event import EventHandler
 import pygame
 
 
@@ -77,6 +78,8 @@ class MainMenu(Window):
         for button in self.buttons:
             if button.rect.collidepoint(mouse_pointer_pos):
                 button.box_color = (255, 0, 0)
+                if button.text == "QUIT" and EventHandler.mouse_button_code == 4:
+                    EventHandler.window_code = 2
             else:
                 button.box_color = (50, 255, 255)
 
