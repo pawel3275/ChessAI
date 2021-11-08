@@ -2,6 +2,7 @@ import pygame
 
 WINDOW_SIZE = (1366, 768)
 WINDOW_MODE_FLAGS = 0  # pygame.NOFRAME
+MAX_FPS = 30
 
 
 class Window:
