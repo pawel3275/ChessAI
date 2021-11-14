@@ -1,10 +1,11 @@
-from utilities.window import Window, WINDOW_SIZE
+from utilities.window import WINDOW_SIZE
 from utilities.button import Button
 from utilities.event import EventHandler
+from menu.view import View
 import pygame
 
 
-class MainMenu(Window):
+class MainMenu(View):
     def __init__(self):
         super().__init__()
         self.buttons = []
@@ -80,6 +81,8 @@ class MainMenu(Window):
                 button.box_color = (255, 0, 0)
                 if button.text == "QUIT" and EventHandler.mouse_button_code == 4:
                     EventHandler.window_code = 2
+                elif button.text == "DENSE" and EventHandler.mouse_button_code == 4:
+                    EventHandler.window_code = 7
             else:
                 button.box_color = (50, 255, 255)
 
@@ -89,6 +92,9 @@ class MainMenu(Window):
         for button in self.buttons:
             button.draw_button()
             pygame.display.flip()
+
+    def draw_view(self):
+        self.draw_buttons()
 
 
 
