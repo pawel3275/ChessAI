@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class ChessContext:
+class ChessGameContext:
     def __init__(self):
         self.board = np.array([
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
@@ -15,3 +15,4 @@ class ChessContext:
         ])
 
         self.moveLog = []
+        self.player_to_move = 0

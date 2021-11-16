@@ -1,9 +1,9 @@
-from utilities.window import Window, MAX_FPS
+from views.window import MAX_FPS
 from utilities.event import EventHandler
-from menu.main_menu import MainMenu
-from menu.view import View
+from views.main_menu_view import MainMenuView
+from views.view import View
 import pygame
-from game.chess_engine import ChessEngine
+from views.chess_game_view import ChessGameView
 
 
 def draw_game_state(screen, game_state):
@@ -14,8 +14,8 @@ def draw_game_state(screen, game_state):
 if __name__ == '__main__':
     pygame.init()
     game_view = View()
-    menu_view = MainMenu()
-    gameEngine = ChessEngine()
+    menu_view = MainMenuView()
+    gameEngine = ChessGameView()
     clock = pygame.time.Clock()
 
     while EventHandler.window_code != 2:
@@ -23,10 +23,8 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             eventCode = EventHandler.process_event(event)
 
-        game_view.draw_view(gameEngine)
-
-        #test =
-        #test.load_images()
+        #game_view.draw_view(gameEngine)
+        game_view.draw_view(menu_view)
 
         clock.tick(MAX_FPS)
         pygame.display.flip()
