@@ -1,6 +1,10 @@
 import pygame
-from views.window import DEFAULT_BUTTON_COLOR, DEFAULT_BUTTON_TEXT_COLOR
 
+SMALL_BUTTON_SIZE = [250, 100]
+LARGE_BUTTON_SIZE = [250, 200]
+DEFAULT_BUTTON_COLOR = (50, 255, 255)
+DEFAULT_BUTTON_TEXT_COLOR = (10, 100, 10)
+ON_BUTTON_COLLISION_COLOR = (255, 0, 0)
 
 class Button:
     def __init__(self, screen, button_id, size, text, box_color=DEFAULT_BUTTON_COLOR,

@@ -1,17 +1,16 @@
-from utilities.button import Button
+from utilities.button import Button, SMALL_BUTTON_SIZE, LARGE_BUTTON_SIZE, ON_BUTTON_COLLISION_COLOR, DEFAULT_BUTTON_COLOR
 from utilities.event import EventHandler
-from views.view import *
+from views.window import *
 import pygame
 
 
-class MainMenuView(View):
+class MainMenuView(Window):
     def __init__(self):
         super().__init__()
         self.__calculate_rect_positions()
         self.__create_button_rect_list(self.screen)
 
     def __calculate_rect_positions(self):
-
         middle_point = (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2)
 
         grid_horizontal_left_lane = middle_point[0] - (SMALL_BUTTON_SIZE[0] / 2) - BORDER_GAP - LARGE_BUTTON_SIZE[0]
@@ -30,36 +29,40 @@ class MainMenuView(View):
 
     def __create_button_rect_list(self, screen):
         rect_position = (self.quit_button_pos, SMALL_BUTTON_SIZE)
-        self.view_buttons.append(Button(screen, "id_quit_button", rect_position, "QUIT"))
+        self.window_buttons.append(Button(screen, "id_quit_button", rect_position, "QUIT"))
 
         rect_position = (self.options_button_pos, SMALL_BUTTON_SIZE)
-        self.view_buttons.append(Button(screen, "id_options_button", rect_position, "OPTIONS"))
+        self.window_buttons.append(Button(screen, "id_options_button", rect_position, "OPTIONS"))
 
         rect_position = (self.play_reinforced_button_pos, LARGE_BUTTON_SIZE)
-        self.view_buttons.append(Button(screen, "id_reinforced_game", rect_position, "REINFORCED"))
+        self.window_buttons.append(Button(screen, "id_reinforced_game", rect_position, "REINFORCED"))
 
         rect_position = (self.play_dense_button_pos, LARGE_BUTTON_SIZE)
-        self.view_buttons.append(Button(screen, "id_dense_game", rect_position, "DENSE"))
+        self.window_buttons.append(Button(screen, "id_dense_game", rect_position, "DENSE"))
 
         rect_position = (self.play_multiplayer_button_pos, LARGE_BUTTON_SIZE)
-        self.view_buttons.append(Button(screen, "id_multiplayer_game", rect_position, "MULTIPLAYER"))
+        self.window_buttons.append(Button(screen, "id_multiplayer_game", rect_position, "MULTIPLAYER"))
 
     def __check_button_mouse_collision(self):
         mouse_pointer_pos = pygame.mouse.get_pos()
-        for button in self.view_buttons:
+        for button in self.window_buttons:
             if button.rect.collidepoint(mouse_pointer_pos):
                 button.box_color = ON_BUTTON_COLLISION_COLOR
                 if button.id == "id_quit_button" and EventHandler.mouse_button_code == 4:
                     EventHandler.window_code = 2
                 elif button.id == "id_dense_game" and EventHandler.mouse_button_code == 4:
-                    EventHandler.window_code = 7
+                    EventHandler.on_view_change(1)
             else:
                 button.box_color = DEFAULT_BUTTON_COLOR
 
     def draw_buttons(self):
         self.__check_button_mouse_collision()
-        for button in self.view_buttons:
+        for button in self.window_buttons:
             button.draw_button()
+
+    def reset_view(self):
+        self.background_colour = DEFAULT_BACKGROUND_COLOR
+        self.screen.fill(self.background_colour)
 
     def draw_view(self):
         self.draw_buttons()

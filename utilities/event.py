@@ -1,4 +1,5 @@
 import pygame
+#from views.view_handler import ViewHandler
 
 EVENT_CODES = {
     0: "SUCCESS",
@@ -16,24 +17,26 @@ EVENT_CODES = {
 class EventHandler:
     mouse_button_code = 0
     window_code = 0
-
-    def __init__(self):
-        pass
+    view_code = 0
 
     @staticmethod
     def process_event(event):
-        EventHandler.mouse_button_code = EventHandler.__on_mouse_button_down(event)
-        EventHandler.window_code = EventHandler.__on_window_action(event)
+        EventHandler.mouse_button_code = EventHandler.on_mouse_button_down(event)
+        EventHandler.window_code = EventHandler.on_window_action(event)
 
     @staticmethod
-    def __on_window_action(event):
+    def on_view_change(new_view):
+        EventHandler.view_code = new_view
+
+    @staticmethod
+    def on_window_action(event):
         if event.type == pygame.QUIT:
             return 2
         if event.type == pygame.RESIZABLE:
             pass
 
     @staticmethod
-    def __on_mouse_button_down(event):
+    def on_mouse_button_down(event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 return 4
