@@ -1,6 +1,8 @@
 import pygame
-#from views.view_handler import ViewHandler
+from game.move import Move
 
+TILE_SIZE = (64, 64)
+BORDER_OFFSET = (128, 128)
 EVENT_CODES = {
     0: "SUCCESS",
     1: "RUNNING",
@@ -34,6 +36,39 @@ class EventHandler:
             return 2
         if event.type == pygame.RESIZABLE:
             pass
+
+    @staticmethod
+    def mouse_board_process(event, game_view):
+        if EventHandler.view_code == 1:
+            current_view = game_view.current_view
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                location = pygame.mouse.get_pos()
+                row = (location[1] - BORDER_OFFSET[1]) // 64
+                col = (location[0] - BORDER_OFFSET[0]) // 64
+                if current_view.square_selected == (row, col):
+                    current_view.square_selected = ()
+                    current_view.player_clicks = []
+                else:
+                    square_selection = (row, col)
+                    current_view.player_clicks.append(square_selection)
+                if len(current_view.player_clicks) == 2:
+                    move = Move(current_view.player_clicks[0], current_view.player_clicks[1], current_view.game_context.board)
+                    print(move.get_chess_notation())
+                    if move in current_view.valid_moves:
+                        current_view.game_context.make_move(move)
+                        current_view.move_made = True
+                        current_view.square_selected = ()
+                        current_view.player_clicks = []
+                    else:
+                        current_view.player_clicks = [square_selection]
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    current_view.game_context.undo_move()
+                    current_view.move_made = True
+
+            if current_view.move_made:
+                current_view.valid_moves = current_view.game_context.get_valid_moves()
+                current_view.move_made = False
 
     @staticmethod
     def on_mouse_button_down(event):

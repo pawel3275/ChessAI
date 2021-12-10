@@ -11,10 +11,16 @@ if __name__ == '__main__':
     game_view = ViewHandler()
     clock = pygame.time.Clock()
 
+    # valid_moves = game_view.views[1].game_context.get_valid_moves()
+    # square_selection = ()
+    # player_clicks = []
+    # move_made = False
     while EventHandler.window_code != 2:
         # Event processing
         for event in pygame.event.get():
             eventCode = EventHandler.process_event(event)
+            if EventHandler.view_code == 1:
+                EventHandler.mouse_board_process(event, game_view)
 
         game_view.draw_view()
 

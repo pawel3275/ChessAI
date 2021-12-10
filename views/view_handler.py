@@ -8,13 +8,14 @@ class ViewHandler:
     def __init__(self):
         self.current_view = self.create_main_menu_view()
         self.current_view_index = 0
-        self.views = self.__populate_view_list()
+        #self.views = self.__populate_view_list()
 
     def __populate_view_list(self):
-        main_menu = self.create_main_menu_view()
-        dense_view = self.create_dense_main_menu_view()
+        pass
+        #main_menu = self.create_main_menu_view()
+        #dense_view = self.create_dense_main_menu_view()
 
-        return main_menu, dense_view
+        #return main_menu, dense_view
 
     @staticmethod
     def create_main_menu_view():
@@ -26,7 +27,10 @@ class ViewHandler:
 
     def draw_view(self):
         if self.current_view_index != EventHandler.view_code:
-            self.current_view = self.views[EventHandler.view_code]
+            if EventHandler.view_code == 0:  # main menu
+                self.current_view = self.create_main_menu_view()
+            if EventHandler.view_code == 1: #dense gampeplay
+                self.current_view = self.create_dense_main_menu_view()
             self.current_view_index = EventHandler.view_code
             self.current_view.reset_view()
 

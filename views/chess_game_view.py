@@ -3,6 +3,7 @@ from views.window import Window, WINDOW_SIZE, BORDER_GAP, DEFAULT_BACKGROUND_COL
 from game.chess_context import ChessGameContext
 from utilities.button import Button, SMALL_BUTTON_SIZE, ON_BUTTON_COLLISION_COLOR, DEFAULT_BUTTON_COLOR
 from utilities.event import EventHandler
+from game.move import Move
 import pygame
 
 IMG_PATH = "images/default_pieces_and_figures/"
@@ -15,6 +16,10 @@ class ChessGameView(Window):
     def __init__(self):
         super().__init__()
         self.images = {}
+        self.board_rects = []
+        self.square_selected = ()
+        self.player_clicks = []
+        self.move_made = False
         self.__load_images()
         self.__create_game_ontext()
         self.__calculate_rect_positions()
@@ -28,6 +33,7 @@ class ChessGameView(Window):
 
     def __create_game_ontext(self):
         self.game_context = ChessGameContext()
+        self.valid_moves = self.game_context.get_valid_moves()
 
     def __draw_board(self):
         white_color = pygame.Color("white")
@@ -40,9 +46,11 @@ class ChessGameView(Window):
                 else:
                     color = grey_color
 
-                pygame.draw.rect(self.screen, color,
-                                 pygame.Rect(j * TILE_SIZE[0] + BORDER_OFFSET[0], i * TILE_SIZE[1] + BORDER_OFFSET[1],
-                                             TILE_SIZE[0], TILE_SIZE[1]))
+                board_rect = pygame.Rect(j * TILE_SIZE[0] + BORDER_OFFSET[0], i * TILE_SIZE[1] + BORDER_OFFSET[1],
+                                             TILE_SIZE[0], TILE_SIZE[1])
+
+                self.board_rects.append(board_rect)
+                pygame.draw.rect(self.screen, color, board_rect)
 
     def __draw_pieces(self):
         for i in range(8):
