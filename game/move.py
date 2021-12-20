@@ -11,7 +11,7 @@ class Move:
         self.end_column = end_square[1]
         self.piece_moved = board[self.start_row][self.start_column]
         self.piece_captured = board[self.end_row][self.end_column]
-        self.move_id = self.start_row * 1000 + self.start_column * 100 + self.end_row * 10 + self.start_column
+        self.move_id = self.start_row * 1000 + self.start_column * 100 + self.end_row * 10 + self.end_column
 
     def __eq__(self, other):
         if isinstance(other, Move):
@@ -19,7 +19,9 @@ class Move:
         return False
 
     def get_chess_notation(self):
+        print(self.get_rank_file(self.start_row, self.start_column))
+        print(self.get_rank_file(self.end_row, self.end_column))
         return self.get_rank_file(self.start_row, self.start_column) + self.get_rank_file(self.end_row, self.end_column)
 
     def get_rank_file(self, row, column):
-        return self.columns_to_files[row] + self.rows_to_ranks[column]
+        return self.columns_to_files[column] + self.rows_to_ranks[row]

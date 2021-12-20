@@ -49,8 +49,8 @@ class EventHandler:
                     current_view.square_selected = ()
                     current_view.player_clicks = []
                 else:
-                    square_selection = (row, col)
-                    current_view.player_clicks.append(square_selection)
+                    current_view.square_selected = (row, col)
+                    current_view.player_clicks.append(current_view.square_selected)
                 if len(current_view.player_clicks) == 2:
                     move = Move(current_view.player_clicks[0], current_view.player_clicks[1], current_view.game_context.board)
                     print(move.get_chess_notation())
@@ -60,7 +60,7 @@ class EventHandler:
                         current_view.square_selected = ()
                         current_view.player_clicks = []
                     else:
-                        current_view.player_clicks = [square_selection]
+                        current_view.player_clicks = [current_view.square_selected]
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     current_view.game_context.undo_move()
