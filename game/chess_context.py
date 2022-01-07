@@ -22,6 +22,8 @@ class ChessGameContext:
         self.black_king_location = (0, 4)
         self.checkmate = False
         self.stalemate = False
+        self.inCheck = False
+        self.enpassant_coord = ()
 
     def make_move(self, move):
         self.board[move.start_row][move.start_column] = "__"
@@ -32,6 +34,17 @@ class ChessGameContext:
             self.white_king_location = (move.end_row, move.end_column)
         elif move.piece_moved == "bK":
             self.black_king_location = (move.end_row, move.end_column)
+
+        if move.is_pawn_promotion:
+            self.board[move.end_row][move.end_column] = move.piece_moved[0] + "Q"
+
+        if move.is_enpassant_move:
+            self.board[move.start_row][move.end_column] = "__"
+
+        if move.piece_moved[1] == "P" and abs(move.start_row - move.end_row) == 2:
+            self.enpassant_coord = ((move.start_row + move.end_row) // 2, move.start_column)
+        else:
+            self.enpassant_coord = ()
 
     def undo_move(self):
         if len(self.moveLog) != 0:
@@ -44,10 +57,19 @@ class ChessGameContext:
             elif move.piece_moved == "bK":
                 self.black_king_location = (move.start_row, move.start_column)
 
+            if move.is_enpassant_move:
+                self.board[move.end_row][move.end_column] = "__"
+                self.board[move.start_row][move.end_column] = move.piece_captured
+                self.enpassant_coord = (move.end_row, move.end_column)
+
+            if move.piece_moved[1] == "P" and abs(move.start_row - move.end_row) == 2:
+                self.enpassant_coord = ()
+
     def get_valid_moves(self):
+        temp_enpassant_coord = self.enpassant_coord
         moves = self.get_possible_moves()
 
-        for i in range(len(moves)-1, -1, -1):
+        for i in range(len(moves) - 1, -1, -1):
             self.make_move(moves[i])
             self.white_to_move = not self.white_to_move
             if self.in_check():
@@ -57,15 +79,14 @@ class ChessGameContext:
 
         if len(moves) == 0:
             if self.in_check():
-                print("CHECKMATE")
                 self.checkmate = True
             else:
-                print("STALEMATE")
                 self.stalemate = True
         else:
             self.stalemate = False
             self.checkmate = False
 
+        self.enpassant_coord = temp_enpassant_coord
         return moves
 
     def in_check(self):
@@ -84,8 +105,7 @@ class ChessGameContext:
         return False
 
     def get_possible_moves(self):
-        moves = [Move((3, 6), (3, 4), self.board)]  # Testing
-
+        moves = []
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
                 turn = self.board[i][j][0]
@@ -103,9 +123,13 @@ class ChessGameContext:
             if column - 1 >= 0:
                 if self.board[row - 1][column - 1][0] == "b":
                     moves_list.append(Move((row, column), (row - 1, column - 1), self.board))
+                elif (row - 1, column - 1) == self.enpassant_coord:
+                    moves_list.append(Move((row, column), (row - 1, column - 1), self.board, is_enpassant_move=True))
             if column + 1 <= 7:
                 if self.board[row - 1][column + 1][0] == "b":
                     moves_list.append(Move((row, column), (row - 1, column + 1), self.board))
+                elif (row - 1, column + 1) == self.enpassant_coord:
+                    moves_list.append(Move((row, column), (row - 1, column + 1), self.board, is_enpassant_move=True))
         else:
             if self.board[row + 1][column] == "__":
                 moves_list.append(Move((row, column), (row + 1, column), self.board))
@@ -114,9 +138,13 @@ class ChessGameContext:
             if column - 1 >= 0:
                 if self.board[row + 1][column - 1][0] == "w":
                     moves_list.append(Move((row, column), (row + 1, column - 1), self.board))
+                elif (row + 1, column - 1) == self.enpassant_coord:
+                    moves_list.append(Move((row, column), (row + 1, column - 1), self.board, is_enpassant_move=True))
             if column + 1 <= 7:
                 if self.board[row + 1][column + 1][0] == "w":
                     moves_list.append(Move((row, column), (row + 1, column + 1), self.board))
+                elif (row + 1, column + 1) == self.enpassant_coord:
+                    moves_list.append(Move((row, column), (row + 1, column + 1), self.board, is_enpassant_move=True))
 
     def get_rook_moves(self, row, column, moves_list):
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1))

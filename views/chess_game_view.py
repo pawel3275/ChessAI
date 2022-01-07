@@ -20,6 +20,8 @@ class ChessGameView(Window):
         self.square_selected = ()
         self.player_clicks = []
         self.move_made = False
+        self.present_animations = False
+        self.is_game_over = False
         self.__load_images()
         self.__create_game_ontext()
         self.__calculate_rect_positions()
@@ -36,9 +38,10 @@ class ChessGameView(Window):
         self.valid_moves = self.game_context.get_valid_moves()
 
     def __draw_board(self):
+        global colors
         white_color = pygame.Color("white")
         grey_color = pygame.Color("gray")
-
+        colors = [white_color, grey_color]
         for i in range(8):
             for j in range(8):
                 if (i + j) % 2 == 0:
@@ -47,17 +50,64 @@ class ChessGameView(Window):
                     color = grey_color
 
                 board_rect = pygame.Rect(j * TILE_SIZE[0] + BORDER_OFFSET[0], i * TILE_SIZE[1] + BORDER_OFFSET[1],
-                                             TILE_SIZE[0], TILE_SIZE[1])
+                                         TILE_SIZE[0], TILE_SIZE[1])
 
                 self.board_rects.append(board_rect)
                 pygame.draw.rect(self.screen, color, board_rect)
+
+    def __highlight_squares(self):
+        if self.square_selected != ():
+            row, column = self.square_selected
+            if self.game_context.board[row][column][0] == ("w" if self.game_context.white_to_move else "b"):
+                square_surface = pygame.Surface(TILE_SIZE)
+                square_surface.set_alpha(100)
+                square_surface.fill(pygame.Color("blue"))
+                self.screen.blit(square_surface,
+                                 ((column * TILE_SIZE[0]) + BORDER_OFFSET[0], (row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
+                square_surface.fill(pygame.Color("yellow"))
+                for move in self.valid_moves:
+                    if move.start_row == row and move.start_column == column:
+                        self.screen.blit(square_surface,
+                                         ((move.end_column * TILE_SIZE[0]) + BORDER_OFFSET[0],
+                                          (move.end_row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
+
+    def animate_move(self, move):
+        global colors
+        delta_row = move.end_row - move.start_row
+        delta_column = move.end_column - move.start_column
+        frames_per_square = 10
+        frame_count = (abs(delta_row) + abs(delta_column)) * frames_per_square
+        for frame in range(frame_count + 1):
+            row, column = (
+                (move.start_row + delta_row * frame / frame_count,
+                 move.start_column + delta_column * frame / frame_count))
+            self.__draw_board()
+            self.__draw_pieces()
+            color = colors[(move.end_row + move.end_column) % 2]
+            end_square = pygame.Rect(move.end_column * TILE_SIZE[0] + + BORDER_OFFSET[0],
+                                     move.end_row * TILE_SIZE[1] + + BORDER_OFFSET[1], TILE_SIZE[0], TILE_SIZE[1])
+            pygame.draw.rect(self.screen, color, end_square)
+            if move.piece_captured != "__":
+                self.screen.blit(self.images[move.piece_captured], end_square)
+            self.screen.blit(self.images[move.piece_moved], pygame.Rect(column * TILE_SIZE[0] + + BORDER_OFFSET[0],
+                                                                        row * TILE_SIZE[1] + + BORDER_OFFSET[1],
+                                                                        TILE_SIZE[0], TILE_SIZE[1]))
+            pygame.display.flip()
+            pygame.time.Clock().tick(60)
+
+    def draw_text(self, text):
+        font = pygame.font.SysFont("Helvitica", 32, True, False)
+        text_obj = font.render(text, False, pygame.Color("Black"))
+        text_location = pygame.Rect(0, 0, 1024, 1080)
+        self.screen.blit(text_obj, text_location)
 
     def __draw_pieces(self):
         for i in range(8):
             for j in range(8):
                 piece = self.game_context.board[i][j]
                 if piece != "__":
-                    rect = pygame.Rect(j * TILE_SIZE[0] + BORDER_OFFSET[0], i * TILE_SIZE[1]+ BORDER_OFFSET[1], CHESS_PIECE_SIZE[0], CHESS_PIECE_SIZE[1])
+                    rect = pygame.Rect(j * TILE_SIZE[0] + BORDER_OFFSET[0], i * TILE_SIZE[1] + BORDER_OFFSET[1],
+                                       CHESS_PIECE_SIZE[0], CHESS_PIECE_SIZE[1])
                     self.screen.blit(self.images[piece], rect)
 
     def __calculate_rect_positions(self):
@@ -93,8 +143,8 @@ class ChessGameView(Window):
 
     def draw_view(self):
         self.__draw_board()
+        self.__highlight_squares()
         self.__draw_pieces()
         self.__check_button_mouse_collision()
         for button in self.window_buttons:
             button.draw_button()
-

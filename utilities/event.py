@@ -41,34 +41,50 @@ class EventHandler:
     def mouse_board_process(event, game_view):
         if EventHandler.view_code == 1:
             current_view = game_view.current_view
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                location = pygame.mouse.get_pos()
-                row = (location[1] - BORDER_OFFSET[1]) // 64
-                col = (location[0] - BORDER_OFFSET[0]) // 64
-                if current_view.square_selected == (row, col):
-                    current_view.square_selected = ()
-                    current_view.player_clicks = []
-                else:
-                    current_view.square_selected = (row, col)
-                    current_view.player_clicks.append(current_view.square_selected)
-                if len(current_view.player_clicks) == 2:
-                    move = Move(current_view.player_clicks[0], current_view.player_clicks[1], current_view.game_context.board)
-                    print(move.get_chess_notation())
-                    if move in current_view.valid_moves:
-                        current_view.game_context.make_move(move)
-                        current_view.move_made = True
+            if not game_view.current_view.is_game_over:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    location = pygame.mouse.get_pos()
+                    row = (location[1] - BORDER_OFFSET[1]) // 64
+                    col = (location[0] - BORDER_OFFSET[0]) // 64
+                    if current_view.square_selected == (row, col):
                         current_view.square_selected = ()
                         current_view.player_clicks = []
                     else:
-                        current_view.player_clicks = [current_view.square_selected]
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
-                    current_view.game_context.undo_move()
-                    current_view.move_made = True
+                        current_view.square_selected = (row, col)
+                        current_view.player_clicks.append(current_view.square_selected)
+                    if len(current_view.player_clicks) == 2:
+                        move = Move(current_view.player_clicks[0], current_view.player_clicks[1], current_view.game_context.board)
+                        print(move.get_chess_notation())
+                        if move in current_view.valid_moves:
+                            current_view.game_context.make_move(move)
+                            current_view.move_made = True
+                            current_view.present_animations = True
+                            current_view.square_selected = ()
+                            current_view.player_clicks = []
+                        else:
+                            current_view.player_clicks = [current_view.square_selected]
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_u:
+                        current_view.game_context.undo_move()
+                        current_view.move_made = True
+                        current_view.present_animations = False
 
-            if current_view.move_made:
-                current_view.valid_moves = current_view.game_context.get_valid_moves()
-                current_view.move_made = False
+                if current_view.move_made:
+                    if current_view.present_animations:
+                        current_view.animate_move(game_view.current_view.game_context.moveLog[-1])
+                    current_view.valid_moves = current_view.game_context.get_valid_moves()
+                    current_view.move_made = False
+                    current_view.present_animations = False
+
+            if game_view.current_view.game_context.checkmate:
+                game_view.current_view.is_game_over = True
+                if game_view.current_view.game_context.white_to_move:
+                    game_view.current_view.draw_text("Black Wins by checkmate!")
+                else:
+                    game_view.current_view.draw_text("White Wins by checkmate!")
+            elif game_view.current_view.game_context.stalemate:
+                game_view.current_view.is_game_over = True
+                game_view.current_view.draw_text("Stalemate")
 
     @staticmethod
     def on_mouse_button_down(event):
