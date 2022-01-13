@@ -74,19 +74,24 @@ class EventHandler:
                         current_view.move_made = True
                         current_view.present_animations = False
 
-                if current_view.move_made:
-                    if current_view.present_animations:
-                        current_view.animate_move(game_view.current_view.game_context.moveLog[-1])
-                    current_view.valid_moves = current_view.game_context.get_valid_moves()
-                    current_view.move_made = False
-                    current_view.present_animations = False
-
+            # AI handling below
             if not current_view.is_game_over and not game_context.human_turn:
                 valid_moves = current_view.game_context.get_valid_moves()
-                AI_move = AI.find_random_move(valid_moves)
+                AI_move = AI.find_best_move(game_context, valid_moves)
+                if AI_move is None:
+                    AI_move = AI.find_random_move(valid_moves)
+                else:
+                    print("dupa")
                 current_view.game_context.make_move(AI_move)
                 current_view.move_made = True
                 current_view.present_animations = True
+
+            if current_view.move_made:
+                if current_view.present_animations:
+                    current_view.animate_move(game_view.current_view.game_context.moveLog[-1])
+                current_view.valid_moves = current_view.game_context.get_valid_moves()
+                current_view.move_made = False
+                current_view.present_animations = False
 
             if current_view.game_context.checkmate:
                 current_view.is_game_over = True

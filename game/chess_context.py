@@ -25,7 +25,7 @@ class ChessGameContext:
         self.inCheck = False
         self.enpassant_coord = ()
         # Both below false to see random moves by both AIs
-        self.player_one = True  # True when human plays white, false for AI
+        self.player_one = False  # True when human plays white, false for AI
         self.player_two = False  # True when human plays white, false for AI
         self.human_turn = False
 
@@ -68,6 +68,9 @@ class ChessGameContext:
 
             if move.piece_moved[1] == "P" and abs(move.start_row - move.end_row) == 2:
                 self.enpassant_coord = ()
+
+        self.checkmate = False
+        self.stalemate = False
 
     def get_valid_moves(self):
         temp_enpassant_coord = self.enpassant_coord
