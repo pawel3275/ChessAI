@@ -24,6 +24,10 @@ class ChessGameContext:
         self.stalemate = False
         self.inCheck = False
         self.enpassant_coord = ()
+        # Both below false to see random moves by both AIs
+        self.player_one = True  # True when human plays white, false for AI
+        self.player_two = False  # True when human plays white, false for AI
+        self.human_turn = False
 
     def make_move(self, move):
         self.board[move.start_row][move.start_column] = "__"
@@ -177,7 +181,7 @@ class ChessGameContext:
                     moves_list.append(Move((row, column), (end_row, end_col), self.board))
 
     def get_bishop_moves(self, row, column, moves_list):
-        directions = ((-1, -1), (-1, 1), (1, -1), (0, 1))
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
         enemy_color = "b" if self.white_to_move else "w"
         for direction in directions:
             for i in range(1, 8):

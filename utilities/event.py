@@ -1,5 +1,6 @@
 import pygame
 from game.move import Move
+import artificial_intelligence.SmartMoveFinder as AI
 
 TILE_SIZE = (64, 64)
 BORDER_OFFSET = (128, 128)
@@ -41,7 +42,10 @@ class EventHandler:
     def mouse_board_process(event, game_view):
         if EventHandler.view_code == 1:
             current_view = game_view.current_view
-            if not game_view.current_view.is_game_over:
+            game_context = game_view.current_view.game_context
+            game_context.human_turn = (game_context.white_to_move and game_context.player_one) or (
+                    not game_context.white_to_move and game_context.player_two)
+            if not current_view.is_game_over and game_context.human_turn:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     location = pygame.mouse.get_pos()
                     row = (location[1] - BORDER_OFFSET[1]) // 64
@@ -53,7 +57,8 @@ class EventHandler:
                         current_view.square_selected = (row, col)
                         current_view.player_clicks.append(current_view.square_selected)
                     if len(current_view.player_clicks) == 2:
-                        move = Move(current_view.player_clicks[0], current_view.player_clicks[1], current_view.game_context.board)
+                        move = Move(current_view.player_clicks[0], current_view.player_clicks[1],
+                                    current_view.game_context.board)
                         print(move.get_chess_notation())
                         if move in current_view.valid_moves:
                             current_view.game_context.make_move(move)
@@ -76,15 +81,22 @@ class EventHandler:
                     current_view.move_made = False
                     current_view.present_animations = False
 
-            if game_view.current_view.game_context.checkmate:
-                game_view.current_view.is_game_over = True
-                if game_view.current_view.game_context.white_to_move:
-                    game_view.current_view.draw_text("Black Wins by checkmate!")
+            if not current_view.is_game_over and not game_context.human_turn:
+                valid_moves = current_view.game_context.get_valid_moves()
+                AI_move = AI.find_random_move(valid_moves)
+                current_view.game_context.make_move(AI_move)
+                current_view.move_made = True
+                current_view.present_animations = True
+
+            if current_view.game_context.checkmate:
+                current_view.is_game_over = True
+                if current_view.game_context.white_to_move:
+                    current_view.draw_text("Black Wins by checkmate!")
                 else:
-                    game_view.current_view.draw_text("White Wins by checkmate!")
-            elif game_view.current_view.game_context.stalemate:
-                game_view.current_view.is_game_over = True
-                game_view.current_view.draw_text("Stalemate")
+                    current_view.draw_text("White Wins by checkmate!")
+            elif current_view.game_context.stalemate:
+                current_view.is_game_over = True
+                current_view.draw_text("Stalemate")
 
     @staticmethod
     def on_mouse_button_down(event):
@@ -96,6 +108,3 @@ class EventHandler:
             elif event.button == 3:
                 return 6
         return 0
-
-
-
