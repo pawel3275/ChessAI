@@ -13,11 +13,17 @@ class MainMenuView(Window):
         self.__create_button_rect_list(self.screen)
         self.limited_draws = False
 
+    '''
+        Loads the image to backgrounds and blits the screen to show it
+    '''
     def __set_background(self):
         background = pygame.image.load(BACKGROUND_PATH + "menu_background.jpg")
         self.screen.blit(background, (0, 0))
         self.limited_draws = True
 
+    '''
+        Populates grid variables for buttons regarding their positions
+    '''
     def __calculate_rect_positions(self):
         middle_point = (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2)
 
@@ -35,6 +41,9 @@ class MainMenuView(Window):
         self.play_dense_button_pos = (grid_horizontal_left_lane, grid_vertical_top_lane)
         self.play_multiplayer_button_pos = (grid_horizontal_right_lane, grid_vertical_top_lane)
 
+    '''
+        Populates rectangle button list for the given view
+    '''
     def __create_button_rect_list(self, screen):
         rect_position = (self.quit_button_pos, SMALL_BUTTON_SIZE)
         self.window_buttons.append(Button(screen, "id_quit_button", rect_position, "QUIT"))
@@ -51,6 +60,9 @@ class MainMenuView(Window):
         rect_position = (self.play_multiplayer_button_pos, LARGE_BUTTON_SIZE)
         self.window_buttons.append(Button(screen, "id_multiplayer_game", rect_position, "MULTIPLAYER"))
 
+    '''
+        Checks if the mouse button is on collision with a rect
+    '''
     def __check_button_mouse_collision(self):
         mouse_pointer_pos = pygame.mouse.get_pos()
         for button in self.window_buttons:
@@ -63,15 +75,24 @@ class MainMenuView(Window):
             else:
                 button.box_color = DEFAULT_BUTTON_COLOR
 
+    '''
+        Draws the buttons for the current view stacked in the class button list
+    '''
     def draw_buttons(self):
         self.__check_button_mouse_collision()
         for button in self.window_buttons:
             button.draw_button()
 
+    '''
+        Resets the whole view to the default background color
+    '''
     def reset_view(self):
         self.background_colour = DEFAULT_BACKGROUND_COLOR
         self.screen.fill(self.background_colour)
 
+    '''
+        Draws the whole view consisting on background, buttons etc.
+    '''
     def draw_view(self):
         if not self.limited_draws:
             self.__set_background()

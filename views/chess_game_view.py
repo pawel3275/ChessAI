@@ -28,21 +28,33 @@ class ChessGameView(Window):
         self.__calculate_rect_positions()
         self.__create_button_rect_list(self.screen)
 
+    '''
+        Loads the image to backgrounds and blits the screen to show it
+    '''
     def __set_background(self):
         background = pygame.image.load(BACKGROUND_PATH + "game_background.jpg")
         self.screen.blit(background, (0, 0))
         self.limited_draws = True
 
+    '''
+        Loads the images of chess figures
+    '''
     def __load_images(self):
         # Load pieces and figures as surfaces from image folder.
         for filename in os.listdir(IMG_PATH):
             image_name = os.path.splitext(filename)[0]
             self.images[image_name] = pygame.transform.scale(pygame.image.load(IMG_PATH + filename), CHESS_PIECE_SIZE)
 
+    '''
+        Constructs the game context class used to play the game
+    '''
     def __create_game_ontext(self):
         self.game_context = ChessGameContext()
         self.valid_moves = self.game_context.get_valid_moves()
 
+    '''
+        Draws the game board for a game view state
+    '''
     def __draw_board(self):
         global colors
         white_color = pygame.Color("white")
@@ -61,6 +73,9 @@ class ChessGameView(Window):
                 self.board_rects.append(board_rect)
                 pygame.draw.rect(self.screen, color, board_rect)
 
+    '''
+        For a specific available move - the square for a piece/figure is highlighted
+    '''
     def __highlight_squares(self):
         if self.square_selected != ():
             row, column = self.square_selected
@@ -78,6 +93,9 @@ class ChessGameView(Window):
                                              ((move.end_column * TILE_SIZE[0]) + BORDER_OFFSET[0],
                                               (move.end_row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
 
+    '''
+        Performs the animation for a given move
+    '''
     def animate_move(self, move):
         global colors
         delta_row = move.end_row - move.start_row
@@ -102,12 +120,18 @@ class ChessGameView(Window):
             pygame.display.flip()
             pygame.time.Clock().tick(60)
 
+    '''
+        Draws a text on a screen
+    '''
     def draw_text(self, text):
         font = pygame.font.SysFont("Helvitica", 32, True, False)
         text_obj = font.render(text, False, pygame.Color("Black"))
         text_location = pygame.Rect(0, 0, 1024, 1080)
         self.screen.blit(text_obj, text_location)
 
+    '''
+        Drawing pieces and figures on a board
+    '''
     def __draw_pieces(self):
         for i in range(8):
             for j in range(8):
@@ -117,6 +141,9 @@ class ChessGameView(Window):
                                        CHESS_PIECE_SIZE[0], CHESS_PIECE_SIZE[1])
                     self.screen.blit(self.images[piece], rect)
 
+    '''
+        Populates grid variables for buttons regarding their positions
+    '''
     def __calculate_rect_positions(self):
         middle_point = (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2)
 
@@ -130,10 +157,16 @@ class ChessGameView(Window):
 
         self.back_button_pos = (grid_horizontal_middle_lane, grid_vertical_middle_lane)
 
+    '''
+        Populates rectangle button list for the given view
+    '''
     def __create_button_rect_list(self, screen):
         rect_position = (self.back_button_pos, SMALL_BUTTON_SIZE)
         self.window_buttons.append(Button(screen, "id_back_button", rect_position, "BACK"))
 
+    '''
+        Checks if the mouse button is on collision with a rect
+    '''
     def __check_button_mouse_collision(self):
         mouse_pointer_pos = pygame.mouse.get_pos()
         for button in self.window_buttons:
@@ -144,10 +177,16 @@ class ChessGameView(Window):
             else:
                 button.box_color = DEFAULT_BUTTON_COLOR
 
+    '''
+        Resets the whole view to the default background color
+    '''
     def reset_view(self):
         self.background_colour = DEFAULT_BACKGROUND_COLOR
         self.screen.fill(self.background_colour)
 
+    '''
+        Draws the whole view consisting on background, buttons etc.
+    '''
     def draw_view(self):
         if not self.limited_draws:
             self.__set_background()

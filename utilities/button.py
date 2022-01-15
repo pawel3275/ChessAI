@@ -18,9 +18,15 @@ class Button:
         self.text = text
         self.rect = pygame.Rect(size)
 
+    '''
+        Adds button rectangle to the list
+    '''
     def add_rect(self):
         pygame.draw.rect(self.screen, self.box_color, self.rect)
 
+    '''
+        Adds button text and blits the screen
+    '''
     def add_text(self):
         text_surface = self.font.render(self.text, True, self.text_color)
         text_scale_width = (self.rect[2] / len(self.text)) * 1.55
@@ -28,6 +34,9 @@ class Button:
         text_position = (self.rect[0] + text_scale_width, self.rect[1] + text_scale_height)
         self.screen.blit(text_surface, text_position)
 
+    '''
+        Performs the button drawings
+    '''
     def draw_button(self):
         self.add_rect()
         self.add_text()

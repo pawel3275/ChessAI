@@ -5,9 +5,18 @@ CHECKMATE_SCORE = 1000
 STALEMATE_SCORE = 0
 DEPTH = 4
 
+'''
+    Returns the random move from available moves in the log
+'''
+
 
 def find_random_move(valid_moves):
     return valid_moves[random.randint(0, len(valid_moves)-1)]
+
+
+'''
+    Finds the best possible move by the given values of the chess pieces
+'''
 
 
 def find_best_move(game_context, valid_moves):
@@ -43,6 +52,11 @@ def find_best_move(game_context, valid_moves):
     return best_move
 
 
+'''
+    Calculates the score for the each move given
+'''
+
+
 def score_material(board):
     score = 0
     for row in board:
@@ -55,11 +69,21 @@ def score_material(board):
     return score
 
 
+'''
+    Min max (non-recurse) to find the best available move
+'''
+
+
 def find_best_move_min_max(game_context, valid_moves):
     global next_move
     next_move = None
     find_move_min_max(game_context, valid_moves, DEPTH)
     return next_move
+
+
+'''
+    Min max (recurse) to find the best available move
+'''
 
 
 def find_move_min_max(game_context, valid_moves, depth, white_moving):
@@ -91,6 +115,12 @@ def find_move_min_max(game_context, valid_moves, depth, white_moving):
             game_context.undo_move()
         return min_score
 
+
+'''
+    Adjust the score if the checkmate is possible to do. Returns MAX score for checkmate possibility
+'''
+
+
 def score_board(game_context):
     if game_context.checkmate:
         if game_context.white_to_move:
@@ -99,7 +129,6 @@ def score_board(game_context):
             return CHECKMATE_SCORE
     elif game_context.stalemate:
         return STALEMATE_SCORE
-
 
     score = 0
     for row in board:

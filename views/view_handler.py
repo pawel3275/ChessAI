@@ -9,14 +9,23 @@ class ViewHandler:
         self.current_view = self.create_main_menu_view()
         self.current_view_index = 0
 
+    '''
+        Main menu view constructor
+    '''
     @staticmethod
     def create_main_menu_view():
         return MainMenuView()
 
+    '''
+        Dense game view constructor
+    '''
     @staticmethod
     def create_dense_main_menu_view():
         return ChessGameView()
 
+    '''
+        Draw the current view stacked in EventHandler
+    '''
     def draw_view(self):
         if self.current_view_index != EventHandler.view_code:
             if EventHandler.view_code == 0:  # main menu

@@ -22,15 +22,24 @@ class EventHandler:
     window_code = 0
     view_code = 0
 
+    '''
+        Processes an event depending on the code of the event by adjusting the event variables
+    '''
     @staticmethod
     def process_event(event):
         EventHandler.mouse_button_code = EventHandler.on_mouse_button_down(event)
         EventHandler.window_code = EventHandler.on_window_action(event)
 
+    '''
+        On view change perform the action of switching to the new view
+    '''
     @staticmethod
     def on_view_change(new_view):
         EventHandler.view_code = new_view
 
+    '''
+        On actions connected strictly to window handles the actions
+    '''
     @staticmethod
     def on_window_action(event):
         if event.type == pygame.QUIT:
@@ -38,6 +47,9 @@ class EventHandler:
         if event.type == pygame.RESIZABLE:
             pass
 
+    '''
+        Handle all mouse button data movements and events
+    '''
     @staticmethod
     def mouse_board_process(event, game_view):
         if EventHandler.view_code == 1:
@@ -103,6 +115,9 @@ class EventHandler:
                 current_view.is_game_over = True
                 current_view.draw_text("Stalemate")
 
+    '''
+        Handle all left mouse button actions
+    '''
     @staticmethod
     def on_mouse_button_down(event):
         if event.type == pygame.MOUSEBUTTONDOWN:

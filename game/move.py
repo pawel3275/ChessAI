@@ -28,9 +28,15 @@ class Move:
             return self.move_id == other.move_id
         return False
 
+    '''
+        Converts the rows and columns to the chess notation
+    '''
     def get_chess_notation(self):
         self.move_chess_notation_id = self.get_rank_file(self.start_row, self.start_column) + self.get_rank_file(self.end_row, self.end_column)
         return self.move_chess_notation_id
 
+    '''
+        Converts the rows and columns to files
+    '''
     def get_rank_file(self, row, column):
         return self.columns_to_files[column] + self.rows_to_ranks[row]

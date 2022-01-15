@@ -33,6 +33,9 @@ class ChessGameContext:
     def __del__(self):
         self.save_log_to_file()
 
+    '''
+        Creates the log file with the data about the game movements
+    '''
     def save_log_to_file(self):
         log_lines = []
         dt_string = "game_log_" + datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + ".csv"
@@ -46,6 +49,9 @@ class ChessGameContext:
             csv_file.write(element + "\n")
         csv_file.close()
 
+    '''
+        Performs a move and updates the board
+    '''
     def make_move(self, move):
         chess_notation_move = move.get_chess_notation()
         self.board[move.start_row][move.start_column] = "__"
@@ -68,6 +74,9 @@ class ChessGameContext:
         else:
             self.enpassant_coord = ()
 
+    '''
+        Undoes the last move from the move log
+    '''
     def undo_move(self):
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()
@@ -90,6 +99,9 @@ class ChessGameContext:
         self.checkmate = False
         self.stalemate = False
 
+    '''
+        Returns the possible moves for a given chess piece
+    '''
     def get_valid_moves(self):
         temp_enpassant_coord = self.enpassant_coord
         moves = self.get_possible_moves()
@@ -114,12 +126,18 @@ class ChessGameContext:
         self.enpassant_coord = temp_enpassant_coord
         return moves
 
+    '''
+        Checks whether the king is in the check position
+    '''
     def in_check(self):
         if self.white_to_move:
             return self.square_attacked(self.white_king_location[0], self.white_king_location[1])
         else:
             return self.square_attacked(self.black_king_location[0], self.black_king_location[1])
 
+    '''
+        Handles the square attack and moves the figure to new square deleting the olf one
+    '''
     def square_attacked(self, row, column):
         self.white_to_move = not self.white_to_move
         opponent_moves = self.get_possible_moves()
@@ -129,6 +147,9 @@ class ChessGameContext:
                 return True
         return False
 
+    '''
+        Returns the list of all possible moves for each chess piece
+    '''
     def get_possible_moves(self):
         moves = []
         for i in range(len(self.board)):
@@ -139,6 +160,9 @@ class ChessGameContext:
                     self.moveFunctions[piece](i, j, moves)
         return moves
 
+    '''
+        Returns the list of all possible moves for pawns
+    '''
     def get_pawn_moves(self, row, column, moves_list):
         if self.white_to_move:
             if self.board[row - 1][column] == "__":
@@ -171,6 +195,9 @@ class ChessGameContext:
                 elif (row + 1, column + 1) == self.enpassant_coord:
                     moves_list.append(Move((row, column), (row + 1, column + 1), self.board, is_enpassant_move=True))
 
+    '''
+        Returns the list of all possible moves for rooks
+    '''
     def get_rook_moves(self, row, column, moves_list):
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
         enemy_color = "b" if self.white_to_move else "w"
@@ -190,6 +217,9 @@ class ChessGameContext:
                 else:
                     break
 
+    '''
+        Returns the list of all possible moves for knights
+    '''
     def get_knight_moves(self, row, column, moves_list):
         directions = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
         ally_color = "w" if self.white_to_move else "b"
@@ -201,6 +231,9 @@ class ChessGameContext:
                 if end_piece[0] != ally_color:
                     moves_list.append(Move((row, column), (end_row, end_col), self.board))
 
+    '''
+        Returns the list of all possible moves for bishops
+    '''
     def get_bishop_moves(self, row, column, moves_list):
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
         enemy_color = "b" if self.white_to_move else "w"
@@ -220,10 +253,16 @@ class ChessGameContext:
                 else:
                     break
 
+    '''
+        Returns the list of all possible moves for queens
+    '''
     def get_queen_moves(self, row, column, moves_list):
         self.get_rook_moves(row, column, moves_list)
         self.get_bishop_moves(row, column, moves_list)
 
+    '''
+        Returns the list of all possible moves for kings
+    '''
     def get_king_moves(self, row, column, moves_list):
         directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
         ally_color = "w" if self.white_to_move else "b"
