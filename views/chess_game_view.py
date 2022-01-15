@@ -3,13 +3,13 @@ from views.window import Window, WINDOW_SIZE, BORDER_GAP, DEFAULT_BACKGROUND_COL
 from game.chess_context import ChessGameContext
 from utilities.button import Button, SMALL_BUTTON_SIZE, ON_BUTTON_COLLISION_COLOR, DEFAULT_BUTTON_COLOR
 from utilities.event import EventHandler
-from game.move import Move
 import pygame
 
 IMG_PATH = "images/default_pieces_and_figures/"
 CHESS_PIECE_SIZE = (64, 64)
 TILE_SIZE = (64, 64)
 BORDER_OFFSET = (128, 128)  # Change to ((WINDOWSIZE - TILE_SIZE[0] * 8) / 2), ... )
+BACKGROUND_PATH = "images/"
 
 
 class ChessGameView(Window):
@@ -22,10 +22,16 @@ class ChessGameView(Window):
         self.move_made = False
         self.present_animations = False
         self.is_game_over = False
+        self.limited_draws = False
         self.__load_images()
         self.__create_game_ontext()
         self.__calculate_rect_positions()
         self.__create_button_rect_list(self.screen)
+
+    def __set_background(self):
+        background = pygame.image.load(BACKGROUND_PATH + "game_background.jpg")
+        self.screen.blit(background, (0, 0))
+        self.limited_draws = True
 
     def __load_images(self):
         # Load pieces and figures as surfaces from image folder.
@@ -58,18 +64,19 @@ class ChessGameView(Window):
     def __highlight_squares(self):
         if self.square_selected != ():
             row, column = self.square_selected
-            if self.game_context.board[row][column][0] == ("w" if self.game_context.white_to_move else "b"):
-                square_surface = pygame.Surface(TILE_SIZE)
-                square_surface.set_alpha(100)
-                square_surface.fill(pygame.Color("blue"))
-                self.screen.blit(square_surface,
-                                 ((column * TILE_SIZE[0]) + BORDER_OFFSET[0], (row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
-                square_surface.fill(pygame.Color("yellow"))
-                for move in self.valid_moves:
-                    if move.start_row == row and move.start_column == column:
-                        self.screen.blit(square_surface,
-                                         ((move.end_column * TILE_SIZE[0]) + BORDER_OFFSET[0],
-                                          (move.end_row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
+            if 0 < row < 9 and 0 < column < 9:
+                if self.game_context.board[row][column][0] == ("w" if self.game_context.white_to_move else "b"):
+                    square_surface = pygame.Surface(TILE_SIZE)
+                    square_surface.set_alpha(100)
+                    square_surface.fill(pygame.Color("blue"))
+                    self.screen.blit(square_surface,
+                                     ((column * TILE_SIZE[0]) + BORDER_OFFSET[0], (row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
+                    square_surface.fill(pygame.Color("yellow"))
+                    for move in self.valid_moves:
+                        if move.start_row == row and move.start_column == column:
+                            self.screen.blit(square_surface,
+                                             ((move.end_column * TILE_SIZE[0]) + BORDER_OFFSET[0],
+                                              (move.end_row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
 
     def animate_move(self, move):
         global colors
@@ -142,6 +149,8 @@ class ChessGameView(Window):
         self.screen.fill(self.background_colour)
 
     def draw_view(self):
+        if not self.limited_draws:
+            self.__set_background()
         self.__draw_board()
         self.__highlight_squares()
         self.__draw_pieces()

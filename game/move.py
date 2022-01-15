@@ -12,6 +12,7 @@ class Move:
         self.piece_moved = board[self.start_row][self.start_column]
         self.piece_captured = board[self.end_row][self.end_column]
         self.is_pawn_promotion = False
+        self.move_chess_notation_id = ""
 
         if (self.piece_moved == "wP" and self.end_row == 0) or (self.piece_moved == "bP" and self.end_row == 7):
             self.isPawnPromotion = True
@@ -28,9 +29,8 @@ class Move:
         return False
 
     def get_chess_notation(self):
-        print(self.get_rank_file(self.start_row, self.start_column))
-        print(self.get_rank_file(self.end_row, self.end_column))
-        return self.get_rank_file(self.start_row, self.start_column) + self.get_rank_file(self.end_row, self.end_column)
+        self.move_chess_notation_id = self.get_rank_file(self.start_row, self.start_column) + self.get_rank_file(self.end_row, self.end_column)
+        return self.move_chess_notation_id
 
     def get_rank_file(self, row, column):
         return self.columns_to_files[column] + self.rows_to_ranks[row]

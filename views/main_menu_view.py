@@ -3,12 +3,20 @@ from utilities.event import EventHandler
 from views.window import *
 import pygame
 
+BACKGROUND_PATH = "images/"
+
 
 class MainMenuView(Window):
     def __init__(self):
         super().__init__()
         self.__calculate_rect_positions()
         self.__create_button_rect_list(self.screen)
+        self.limited_draws = False
+
+    def __set_background(self):
+        background = pygame.image.load(BACKGROUND_PATH + "menu_background.jpg")
+        self.screen.blit(background, (0, 0))
+        self.limited_draws = True
 
     def __calculate_rect_positions(self):
         middle_point = (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2)
@@ -65,4 +73,6 @@ class MainMenuView(Window):
         self.screen.fill(self.background_colour)
 
     def draw_view(self):
+        if not self.limited_draws:
+            self.__set_background()
         self.draw_buttons()

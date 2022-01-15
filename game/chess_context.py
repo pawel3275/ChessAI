@@ -1,4 +1,5 @@
 import numpy as np
+from datetime import datetime
 from game.move import Move
 
 
@@ -25,11 +26,28 @@ class ChessGameContext:
         self.inCheck = False
         self.enpassant_coord = ()
         # Both below false to see random moves by both AIs
-        self.player_one = False  # True when human plays white, false for AI
+        self.player_one = True  # True when human plays white, false for AI
         self.player_two = False  # True when human plays white, false for AI
         self.human_turn = False
 
+    def __del__(self):
+        self.save_log_to_file()
+
+    def save_log_to_file(self):
+        log_lines = []
+        dt_string = "game_log_" + datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + ".csv"
+        csv_file = open(dt_string, "a")
+        if len(self.moveLog) != 0:
+            for move in self.moveLog:
+                log_line = str(move.piece_moved) + "_" + str(move.move_chess_notation_id)
+                log_lines.append(log_line)
+
+        for element in log_lines:
+            csv_file.write(element + "\n")
+        csv_file.close()
+
     def make_move(self, move):
+        chess_notation_move = move.get_chess_notation()
         self.board[move.start_row][move.start_column] = "__"
         self.board[move.end_row][move.end_column] = move.piece_moved
         self.moveLog.append(move)
