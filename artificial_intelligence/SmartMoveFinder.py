@@ -208,7 +208,7 @@ def find_move_nega_max_alpha_beta_pruning(game_context, valid_moves, depth, alph
     for move in valid_moves:
         game_context.make_move(move)
         next_moves = game_context.get_valid_moves()
-        score = -find_move_nega_max_alpha_beta_pruning(game_context, next_moves, depth - 1, -beta, -alpha -turn_multiplier)
+        score = -find_move_nega_max_alpha_beta_pruning(game_context, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
         if score > max_score:
             max_score = score
             if depth == DEPTH:
