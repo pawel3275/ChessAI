@@ -3,26 +3,37 @@ import random
 piece_score = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "P": 1}
 CHECKMATE_SCORE = 1000
 STALEMATE_SCORE = 0
-DEPTH = 4
-
-'''
-    Returns the random move from available moves in the log
-'''
+DEPTH = 2
 
 
 def find_random_move(valid_moves):
+    """Returns the random move from available moves in the log
+
+    Args:
+        valid_moves (list): List of all possible valid moves for a given palyer.
+
+    Returns:
+        list: List of random valid moves for a given palyer.
+    """
     return valid_moves[random.randint(0, len(valid_moves)-1)]
 
 
-'''
-    Finds the best possible move by the given values of the chess pieces
-'''
+def find_best_move_min_max_no_recursion(game_context, valid_moves):
+    """Finds the best possible move by the given values of the chess piece.
 
+    Algorithm of min max without recursion.
 
-def find_best_move(game_context, valid_moves):
+    Args:
+        game_context (GameContext): Context of the game object.
+        valid_moves (list): listt of possible moves.
+
+    Returns:
+        Move: Move object with the best move possible.
+    """
     turn_multiplier = 1 if game_context.white_to_move else -1
-    opponent_min_max_score = -CHECKMATE_SCORE
+    opponent_min_max_score = CHECKMATE_SCORE
     best_move = None
+    random.shuffle(valid_moves)
     for player_move in valid_moves:
         game_context.make_move(player_move)
         opponent_moves = game_context.get_valid_moves()
@@ -35,6 +46,7 @@ def find_best_move(game_context, valid_moves):
             opponent_max_score = -CHECKMATE_SCORE
             for opponent_move in opponent_moves:
                 game_context.make_move(opponent_move)
+                #opponent_moves = game_context.get_valid_moves()
                 if game_context.checkmate:
                     score = -turn_multiplier * CHECKMATE_SCORE
                 elif game_context.stalemate:
@@ -52,12 +64,15 @@ def find_best_move(game_context, valid_moves):
     return best_move
 
 
-'''
-    Calculates the score for the each move given
-'''
-
-
 def score_material(board):
+    """Calculates the score for the each move given. (Loss function)
+
+    Args:
+        board (string matrix): board matrix
+
+    Returns:
+        int: score
+    """
     score = 0
     for row in board:
         for square in row:
@@ -74,19 +89,42 @@ def score_material(board):
 '''
 
 
-def find_best_move_min_max(game_context, valid_moves):
+def find_best_move(game_context, valid_moves):
+    """Different implementations for finding the best move for the AI.
+
+    Args:
+        game_context (GameContext): context of the game
+        valid_moves (list): list of possible moves
+
+    Returns:
+        Move: object containing the next move
+    """
     global next_move
     next_move = None
-    find_move_min_max(game_context, valid_moves, DEPTH)
+    random.shuffle(valid_moves)
+    # uncomment below for min max
+    # find_move_min_max(game_context, valid_moves, DEPTH)  
+    
+    # uncomment below for nega max
+    # find_move_nega_max(game_context, valid_moves, DEPTH, 1 if game_context.white_to_move else -1) 
+
+    # uncomment below for nega max alpha beta pruning
+    find_move_nega_max_alpha_beta_pruning(game_context, valid_moves, DEPTH, -CHECKMATE_SCORE, CHECKMATE_SCORE, 1 if game_context.white_to_move else -1)
     return next_move
 
 
-'''
-    Min max (recurse) to find the best available move
-'''
-
-
 def find_move_min_max(game_context, valid_moves, depth, white_moving):
+    """Min max (recurse) to find the best available move
+
+    Args:
+        game_context (GameContext): context of the game
+        valid_moves (list): list of possible moves
+        depth (int): how deep we want to go in finding the optimal move.
+        white_moving (bool): bool if it's whites turn.
+
+    Returns:
+        int: score for a move.
+    """
     global next_move
     if depth == 0:
         return score_material(game_context.board)
@@ -94,7 +132,7 @@ def find_move_min_max(game_context, valid_moves, depth, white_moving):
     if white_moving:
         max_score = -CHECKMATE_SCORE
         for move in valid_moves:
-            game_context.make_move()
+            game_context.make_move(move)
             next_moves = game_context.get_valid_moves()
             score = find_move_min_max(game_context, next_moves, depth-1, False)
             if score > max_score:
@@ -116,12 +154,85 @@ def find_move_min_max(game_context, valid_moves, depth, white_moving):
         return min_score
 
 
-'''
-    Adjust the score if the checkmate is possible to do. Returns MAX score for checkmate possibility
-'''
+def find_move_nega_max(game_context, valid_moves, depth, turn_multiplier):
+    """Find the best move using nega max algorithm
+
+    Args:
+        game_context (GameContext): context of the game
+        valid_moves (list): list of possible moves
+        depth (int): how deep we want to go in finding the optimal move.
+        turn_multiplier (int): multiplier for the score losee function.
+
+    Returns:
+        int: score for a given move
+    """
+    global next_move
+    if depth == 0:
+        return turn_multiplier * score_board(game_context)
+    
+    max_score = -CHECKMATE_SCORE
+
+    for move in valid_moves:
+        game_context.make_move(move)
+        next_moves = game_context.get_valid_moves()
+        score = -find_move_min_max(game_context, next_moves, depth - 1, -turn_multiplier)
+        if score > max_score:
+            max_score = score
+            if depth == DEPTH:
+                next_move = move
+        game_context.undo_move()
+
+    return max_score
+
+
+def find_move_nega_max_alpha_beta_pruning(game_context, valid_moves, depth, alpha, beta, turn_multiplier):
+    """Find the best move using nega max alpha beta pruning algorithm
+
+    Args:
+        game_context (GameContext): context of the game
+        valid_moves (list): list of possible moves
+        depth (int): how deep we want to go in finding the optimal move.
+        alpha (int): alpha border value
+        beta (int): beta border value
+        turn_multiplier (int): multiplier for the score losee function.
+
+    Returns:
+        int: score for a given move
+    """
+    global next_move
+    if depth == 0:
+        return turn_multiplier * score_board(game_context)
+    
+    max_score = -CHECKMATE_SCORE
+
+    for move in valid_moves:
+        game_context.make_move(move)
+        next_moves = game_context.get_valid_moves()
+        score = -find_move_nega_max_alpha_beta_pruning(game_context, next_moves, depth - 1, -beta, -alpha -turn_multiplier)
+        if score > max_score:
+            max_score = score
+            if depth == DEPTH:
+                next_move = move
+        game_context.undo_move()
+        
+        if max_score > alpha:
+            alpha = max_score
+        if alpha >= beta:
+            break
+
+    return max_score
 
 
 def score_board(game_context):
+    """Adjust the score if the checkmate is possible to do. Returns MAX score for checkmate possibility
+
+
+    Args:
+        game_context (GameContext): context of the game
+
+    Returns:
+        int: score for a given move
+    """
     if game_context.checkmate:
         if game_context.white_to_move:
             return -CHECKMATE_SCORE
@@ -131,7 +242,7 @@ def score_board(game_context):
         return STALEMATE_SCORE
 
     score = 0
-    for row in board:
+    for row in game_context.board:
         for square in row:
             if square[0] == "w":
                 score += piece_score[square[1]]

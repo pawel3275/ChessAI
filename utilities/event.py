@@ -18,40 +18,57 @@ EVENT_CODES = {
 
 
 class EventHandler:
+    """Class for handling events in game.
+    """
     mouse_button_code = 0
     window_code = 0
     view_code = 0
 
-    '''
-        Processes an event depending on the code of the event by adjusting the event variables
-    '''
     @staticmethod
     def process_event(event):
+        """Processes an event depending on the code of the event by adjusting the event variables
+
+        Args:
+            event (Event): _description_
+        """
         EventHandler.mouse_button_code = EventHandler.on_mouse_button_down(event)
         EventHandler.window_code = EventHandler.on_window_action(event)
 
-    '''
-        On view change perform the action of switching to the new view
-    '''
     @staticmethod
     def on_view_change(new_view):
+        """On view change perform the action of switching to the new view
+
+        Args:
+            new_view (int): Code for the new view.
+        """
         EventHandler.view_code = new_view
 
     '''
-        On actions connected strictly to window handles the actions
+        
     '''
     @staticmethod
     def on_window_action(event):
+        """On actions connected strictly to window handles the actions
+
+        Args:
+            event (int): event number
+
+        Returns:
+            int: coresponding pygame event number
+        """
         if event.type == pygame.QUIT:
             return 2
         if event.type == pygame.RESIZABLE:
             pass
 
-    '''
-        Handle all mouse button data movements and events
-    '''
     @staticmethod
     def mouse_board_process(event, game_view):
+        """Handler for mouse operations like clicking and hovering
+
+        Args:
+            event (int): event type
+            game_view (int): view code
+        """
         if EventHandler.view_code == 1:
             current_view = game_view.current_view
             game_context = game_view.current_view.game_context
@@ -115,11 +132,16 @@ class EventHandler:
                 current_view.is_game_over = True
                 current_view.draw_text("Stalemate")
 
-    '''
-        Handle all left mouse button actions
-    '''
     @staticmethod
     def on_mouse_button_down(event):
+        """Handle all left mouse button actions
+
+        Args:
+            event (int): event code
+
+        Returns:
+            int: corresponding event number.
+        """
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 return 4

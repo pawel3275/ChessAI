@@ -13,6 +13,8 @@ BACKGROUND_PATH = "images/"
 
 
 class ChessGameView(Window):
+    """Class containing the info regarding view of the game - like window or board.
+    """
     def __init__(self):
         super().__init__()
         self.images = {}
@@ -28,34 +30,30 @@ class ChessGameView(Window):
         self.__calculate_rect_positions()
         self.__create_button_rect_list(self.screen)
 
-    '''
-        Loads the image to backgrounds and blits the screen to show it
-    '''
     def __set_background(self):
+        """Loads the image to backgrounds and blits the screen to show it
+        """
         background = pygame.image.load(BACKGROUND_PATH + "game_background.jpg")
         self.screen.blit(background, (0, 0))
         self.limited_draws = True
 
-    '''
-        Loads the images of chess figures
-    '''
     def __load_images(self):
+        """Loads the images of chess figures
+        """
         # Load pieces and figures as surfaces from image folder.
         for filename in os.listdir(IMG_PATH):
             image_name = os.path.splitext(filename)[0]
             self.images[image_name] = pygame.transform.scale(pygame.image.load(IMG_PATH + filename), CHESS_PIECE_SIZE)
 
-    '''
-        Constructs the game context class used to play the game
-    '''
     def __create_game_ontext(self):
+        """Constructs the game context class used to play the game
+        """
         self.game_context = ChessGameContext()
         self.valid_moves = self.game_context.get_valid_moves()
 
-    '''
-        Draws the game board for a game view state
-    '''
     def __draw_board(self):
+        """Draws the game board for a game view state
+        """
         global colors
         white_color = pygame.Color("white")
         grey_color = pygame.Color("gray")
@@ -73,10 +71,9 @@ class ChessGameView(Window):
                 self.board_rects.append(board_rect)
                 pygame.draw.rect(self.screen, color, board_rect)
 
-    '''
-        For a specific available move - the square for a piece/figure is highlighted
-    '''
     def __highlight_squares(self):
+        """For a specific available move - the square for a piece/figure is highlighted
+        """
         if self.square_selected != ():
             row, column = self.square_selected
             if 0 < row < 9 and 0 < column < 9:
@@ -93,10 +90,9 @@ class ChessGameView(Window):
                                              ((move.end_column * TILE_SIZE[0]) + BORDER_OFFSET[0],
                                               (move.end_row * TILE_SIZE[1]) + BORDER_OFFSET[1]))
 
-    '''
-        Performs the animation for a given move
-    '''
     def animate_move(self, move):
+        """Performs the animation for a given move
+        """
         global colors
         delta_row = move.end_row - move.start_row
         delta_column = move.end_column - move.start_column
@@ -120,19 +116,20 @@ class ChessGameView(Window):
             pygame.display.flip()
             pygame.time.Clock().tick(60)
 
-    '''
-        Draws a text on a screen
-    '''
     def draw_text(self, text):
+        """Draws a text on a screen
+
+        Args:
+            text (_type_): _description_
+        """
         font = pygame.font.SysFont("Helvitica", 32, True, False)
         text_obj = font.render(text, False, pygame.Color("Black"))
         text_location = pygame.Rect(0, 0, 1024, 1080)
         self.screen.blit(text_obj, text_location)
 
-    '''
-        Drawing pieces and figures on a board
-    '''
     def __draw_pieces(self):
+        """Drawing pieces and figures on a board
+        """
         for i in range(8):
             for j in range(8):
                 piece = self.game_context.board[i][j]
@@ -141,10 +138,9 @@ class ChessGameView(Window):
                                        CHESS_PIECE_SIZE[0], CHESS_PIECE_SIZE[1])
                     self.screen.blit(self.images[piece], rect)
 
-    '''
-        Populates grid variables for buttons regarding their positions
-    '''
     def __calculate_rect_positions(self):
+        """Populates grid variables for buttons regarding their positions
+        """
         middle_point = (WINDOW_SIZE[0] / 2, WINDOW_SIZE[1] / 2)
 
         grid_horizontal_left_lane = BORDER_OFFSET[0]
@@ -157,17 +153,15 @@ class ChessGameView(Window):
 
         self.back_button_pos = (grid_horizontal_middle_lane, grid_vertical_middle_lane)
 
-    '''
-        Populates rectangle button list for the given view
-    '''
     def __create_button_rect_list(self, screen):
+        """Populates rectangle button list for the given view
+        """
         rect_position = (self.back_button_pos, SMALL_BUTTON_SIZE)
         self.window_buttons.append(Button(screen, "id_back_button", rect_position, "BACK"))
 
-    '''
-        Checks if the mouse button is on collision with a rect
-    '''
     def __check_button_mouse_collision(self):
+        """Checks if the mouse button is on collision with a rect
+        """
         mouse_pointer_pos = pygame.mouse.get_pos()
         for button in self.window_buttons:
             if button.rect.collidepoint(mouse_pointer_pos):
@@ -177,17 +171,15 @@ class ChessGameView(Window):
             else:
                 button.box_color = DEFAULT_BUTTON_COLOR
 
-    '''
-        Resets the whole view to the default background color
-    '''
     def reset_view(self):
+        """Resets the whole view to the default background color
+        """
         self.background_colour = DEFAULT_BACKGROUND_COLOR
         self.screen.fill(self.background_colour)
 
-    '''
-        Draws the whole view consisting on background, buttons etc.
-    '''
     def draw_view(self):
+        """Draws the whole view consisting on background, buttons etc.
+        """
         if not self.limited_draws:
             self.__set_background()
         self.__draw_board()

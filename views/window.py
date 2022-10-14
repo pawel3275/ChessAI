@@ -8,7 +8,11 @@ DEFAULT_BACKGROUND_COLOR = (255, 100, 125)
 
 
 class Window:
+    """Class containing main game window attributes.
+    """
     def __init__(self):
+        """Constructor
+        """
         self.window_buttons = []
         self.screen = pygame.display.set_mode(WINDOW_SIZE, WINDOW_MODE_FLAGS)
         self.background_colour = DEFAULT_BACKGROUND_COLOR

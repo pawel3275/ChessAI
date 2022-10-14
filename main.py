@@ -4,8 +4,13 @@ from views.window import Window
 from views.view_handler import ViewHandler
 import pygame
 
+"""
+    ChessAI by Pawel Iwinski & Cezary Graban
 
+"""
 if __name__ == '__main__':
+    """Main game function
+    """
     pygame.init()
     game_main_window = Window()
     game_view = ViewHandler()
